@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Railyn — Indian Railways Network Explorer</title>
+    <meta name="description" content="Explore Indian Railways scheduled routes, timetables, stations and lines on a map. Kerala + Konkan coverage." />
+
+    <!-- PWA theme -->
+    <meta name="theme-color" content="#863bff" />
+    <meta name="background-color" content="#f4f6f9" />
+
+    <!-- PWA manifest (injected by vite-plugin-pwa, but kept as fallback) -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- iOS PWA support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Railyn" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+
+    <!-- Prevent phone number detection on iOS -->
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  </head>
+  <body>
+    <div id="root" style="height:100%;"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>*{box-sizing:border-box}body{margin:0;font-family:'Inter',system-ui,sans-serif}a{color:#2b6ef2}a:hover{color:#1f57c9}.maplibregl-ctrl-attrib{display:none}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #2b6ef2;outline-offset:2px}</style>
+</helmet>
+<div style="width:410px;height:864px;padding:10px;background:#0c111a;border-radius:60px;box-shadow:0 30px 60px rgba(15,23,34,.25);flex:none">
+<div style="position:relative;width:390px;height:844px;overflow:hidden;border-radius:50px;background:#f4f6f9;font-family:'Inter',system-ui,sans-serif;color:#0f1722;-webkit-font-smoothing:antialiased">
+<div ref="{{ mapRef }}" style="position:absolute;inset:0;background:#e9edf2"></div>
+<div style="position:absolute;top:0;left:0;right:0;height:47px;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:8px 32px 0 36px;font-weight:600;font-size:16px;pointer-events:none;background:{{ statusBg }}"><span>9:41</span><div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;font-weight:700">5G</span><div style="width:25px;height:12px;border:1.5px solid #0f1722;border-radius:4px;padding:1.5px"><div style="width:72%;height:100%;background:#0f1722;border-radius:1.5px"></div></div></div></div>
+
+<sc-if value="{{ isMap }}" hint-placeholder-val="{{ true }}">
+<div onClick="{{ go.search }}" style="position:absolute;z-index:15;top:54px;left:14px;right:14px;height:54px;display:flex;align-items:center;gap:10px;padding:0 8px 0 18px;background:#fff;border-radius:27px;box-shadow:0 8px 24px rgba(15,23,34,.10);cursor:text;color:#0f1722"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><span style="flex:1;font-size:15px;color:#7a8494">Train, station, line or zone</span><span style="height:38px;padding:0 14px;border-radius:19px;background:#e8f0fe;color:#2b6ef2;display:inline-flex;align-items:center;font-weight:700;font-size:14px;letter-spacing:-.01em">Railyn</span></div>
+<div style="position:absolute;z-index:14;top:118px;left:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+<div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:16px;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(15,23,34,.08);font-size:12px;font-weight:600;white-space:nowrap"><div style="width:12px;height:12px;border-radius:6px;border:1.5px dashed #0fa390"></div>Coverage: Kerala + Konkan</div>
+<div style="font-size:10px;padding:3px 8px;border-radius:8px;background:rgba(255,255,255,.8);color:#4a5463;white-space:nowrap">© OpenStreetMap contributors · OpenFreeMap</div>
+</div>
+<div style="position:absolute;z-index:14;top:118px;right:14px;display:flex;flex-direction:column;gap:8px">
+<button onClick="{{ toggleLayers }}" aria-label="Layers and legend" style="width:48px;height:48px;border-radius:24px;display:grid;place-items:center;border:0;background:{{ ctl.layersBg }};color:{{ ctl.layersFg }};box-shadow:0 6px 18px rgba(15,23,34,.12);cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg></button>
+<button onClick="{{ locate }}" aria-label="Locate me" style="width:48px;height:48px;border-radius:24px;display:grid;place-items:center;border:0;background:#fff;color:#2b6ef2;box-shadow:0 6px 18px rgba(15,23,34,.12);cursor:pointer" style-hover="background:#f2f6fe"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg></button>
+</div>
+<sc-if value="{{ layersOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;z-index:16;top:118px;right:70px;width:240px;background:#fff;border-radius:22px;box-shadow:0 16px 40px rgba(15,23,34,.18);padding:16px;display:flex;flex-direction:column;gap:10px">
+<span style="font-size:15px;font-weight:700">Legend</span>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:14px;height:14px;border-radius:7px;border:2.5px solid #3b4657;background:#fff"></div>Junction</div>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:14px;display:grid;place-items:center"><div style="width:9px;height:9px;border-radius:5px;border:2px solid #3b4657"></div></div>Station<span style="color:#7a8494;font-size:12px">zoom in</span></div>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:14px;height:3px;border-radius:2px;background:#3b4657"></div>Railway line</div>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:14px;border-top:3px dotted #9aa3b2"></div>Konkan Railway</div>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:14px;height:5px;border-radius:3px;background:#2b6ef2;box-shadow:0 0 6px rgba(43,110,242,.6)"></div>Selected route</div>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:14px;display:grid;place-items:center"><div style="width:12px;height:12px;border-radius:6px;background:#0fa390"></div></div>Origin</div>
+<div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:14px;height:5px;border-radius:3px;background:#7a5af5"></div>Line view</div>
+<div style="height:1px;background:#eef1f5;margin:2px 0"></div>
+<button onClick="{{ toggleCov }}" style="display:flex;align-items:center;justify-content:space-between;height:40px;border:0;background:transparent;font-family:'Inter',system-ui,sans-serif;font-size:14px;padding:0;cursor:pointer;color:#0f1722">Coverage outline<div style="width:46px;height:28px;border-radius:14px;background:{{ covTag }};position:relative;flex:none;transition:background .2s"><div style="position:absolute;top:3px;left:{{ covKnob }};width:22px;height:22px;border-radius:11px;background:#fff;box-shadow:0 1px 3px rgba(15,23,34,.25);transition:left .2s"></div></div></button>
+<button onClick="{{ toggleLabels }}" style="display:flex;align-items:center;justify-content:space-between;height:40px;border:0;background:transparent;font-family:'Inter',system-ui,sans-serif;font-size:14px;padding:0;cursor:pointer;color:#0f1722">Station labels<div style="width:46px;height:28px;border-radius:14px;background:{{ labTag }};position:relative;flex:none;transition:background .2s"><div style="position:absolute;top:3px;left:{{ labKnob }};width:22px;height:22px;border-radius:11px;background:#fff;box-shadow:0 1px 3px rgba(15,23,34,.25);transition:left .2s"></div></div></button>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ hasSheet }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;z-index:20;left:{{ sh.x }}px;right:{{ sh.x }}px;top:{{ sh.top }}px;bottom:0;background:rgba(255,255,255,.9);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border-radius:{{ sh.radius }};box-shadow:{{ sh.shadow }};display:flex;flex-direction:column;overflow:hidden;transition:{{ sh.trans }}">
+<div onPointerDown="{{ dragStart }}" style="touch-action:none;cursor:grab;padding:8px 18px 12px;flex:none;border-bottom:{{ sh.headRule }}">
+<div style="width:40px;height:5px;border-radius:3px;background:#cfd5de;margin:0 auto 10px"></div>
+<div style="display:flex;align-items:center;gap:6px">
+<sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ back }}" aria-label="Back" style="width:38px;height:38px;flex:none;border-radius:19px;display:grid;place-items:center;border:0;background:#eef1f5;cursor:pointer;color:#0f1722" style-hover="background:#e2e7ee"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button></sc-if>
+<span style="flex:1;font-size:13px;font-weight:600;color:{{ hd.kc }}">{{ hd.kicker }}</span>
+<sc-if value="{{ hd.canFav }}" hint-placeholder-val="{{ false }}"><button onClick="{{ toggleFav }}" aria-label="Save" style="width:38px;height:38px;border-radius:19px;display:grid;place-items:center;border:0;background:#eef1f5;cursor:pointer;color:{{ hd.favColor }}" style-hover="background:#e2e7ee"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{ hd.favFill }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg></button></sc-if>
+<button onClick="{{ share }}" aria-label="Share" style="width:38px;height:38px;flex:none;border-radius:19px;display:grid;place-items:center;border:0;background:#eef1f5;cursor:pointer;color:#0f1722" style-hover="background:#e2e7ee"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" x2="12" y1="2" y2="15"></line></svg></button>
+<button onClick="{{ closeSheet }}" aria-label="Close" style="width:38px;height:38px;flex:none;border-radius:19px;display:grid;place-items:center;border:0;background:#eef1f5;cursor:pointer;color:#0f1722" style-hover="background:#e2e7ee"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+</div>
+<div style="font-size:23px;font-weight:700;letter-spacing:-.025em;line-height:1.2;margin-top:6px;text-wrap:pretty">{{ hd.title }}</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:6px;min-width:0"><span style="height:24px;padding:0 9px;border-radius:8px;background:{{ hd.cb }};color:{{ hd.cf }};font-size:12px;font-weight:700;display:inline-flex;align-items:center;flex:none">{{ hd.code }}</span><span style="font-size:13px;color:#5b6574;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ hd.sub }}</span></div>
+</div>
+<div style="flex:1;overflow-y:auto;padding:4px 16px {{ sh.padB }}px">
+
+<sc-if value="{{ isTrain }}" hint-placeholder-val="{{ false }}">
+<div style="background:#f1f4f8;border-radius:22px;padding:16px;margin-top:10px">
+<div style="display:flex;gap:6px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;border-radius:15px;background:#fff;font-size:13px;font-weight:600;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>{{ tr.dur }}</span><span style="display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:15px;background:#fff;font-size:13px;font-weight:600;white-space:nowrap">{{ tr.dist }}</span><span style="display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:15px;background:#fff;font-size:13px;font-weight:600;white-space:nowrap">{{ tr.halts }}&nbsp;halts</span></div>
+<div style="display:grid;grid-template-columns:22px 1fr auto;gap:0 12px;margin-top:14px;align-items:center">
+<div style="width:20px;height:20px;border-radius:10px;border:2px dashed #0fa390"></div>
+<div style="min-width:0"><div style="font-size:16px;font-weight:600">{{ tr.srcN }}</div><div style="font-size:12px;color:#5b6574">{{ tr.src }} · Departs</div></div>
+<span style="font-size:22px;font-weight:700;letter-spacing:-.02em">{{ tr.depT }}</span>
+<div style="height:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#2b6ef2"><div style="flex:1;border-left:2px dashed #b8cdf8"></div><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="3" rx="2"></rect><path d="M4 11h16"></path><path d="M12 3v8"></path><path d="m8 19-2 3"></path><path d="m18 22-2-3"></path><path d="M8 15h.01"></path><path d="M16 15h.01"></path></svg><div style="flex:1;border-left:2px dashed #b8cdf8"></div></div>
+<div></div><div></div>
+<div style="width:20px;height:20px;border-radius:10px;background:#2b6ef2;box-shadow:0 0 0 4px #cddcfd"></div>
+<div style="min-width:0"><div style="font-size:16px;font-weight:600">{{ tr.dstN }}</div><div style="font-size:12px;color:#5b6574">{{ tr.dst }} · Arrives</div></div>
+<span style="font-size:22px;font-weight:700;letter-spacing:-.02em;white-space:nowrap">{{ tr.arrT }}<sup style="font-size:11px;color:#a2620a;margin-left:2px">{{ tr.arrPlus }}</sup></span>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:12px"><sc-for list="{{ tr.days }}" as="d" hint-placeholder-count="7"><div style="height:42px;border-radius:21px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13px;font-weight:600;background:{{ d.bg }};color:{{ d.fg }}">{{ d.l }}<div style="width:5px;height:5px;border-radius:3px;background:{{ d.dot }}"></div></div></sc-for></div>
+<div style="font-size:12px;color:#5b6574;margin:6px 4px 0">{{ tr.daysText }} from origin · <span style="color:#a2620a;font-weight:600">● today</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+<button onClick="{{ toggleFav }}" style="height:50px;border-radius:16px;border:0;background:#2b6ef2;color:#fff;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:#1f5ee0">{{ tr.saveLabel }}</button>
+<button onClick="{{ tr.openPair }}" style="height:50px;border-radius:16px;border:0;background:#eef1f5;color:#0f1722;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:#e2e7ee">Return · {{ tr.pair }}</button>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Timetable</span>
+<div style="display:flex;padding:3px;border-radius:14px;background:#eef1f5"><button onClick="{{ ttHalts }}" style="height:32px;padding:0 12px;border:0;border-radius:11px;font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:{{ ttSeg.hBg }};color:{{ ttSeg.hFg }};box-shadow:{{ ttSeg.hSh }}">Halts</button><button onClick="{{ ttAllOn }}" style="height:32px;padding:0 12px;border:0;border-radius:11px;font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:{{ ttSeg.aBg }};color:{{ ttSeg.aFg }};box-shadow:{{ ttSeg.aSh }}">All stations</button></div></div>
+<div style="background:#f1f4f8;border-radius:22px;padding:6px 14px">
+<sc-for list="{{ tr.stops }}" as="s" hint-placeholder-count="6">
+<div onClick="{{ s.open }}" style="display:grid;grid-template-columns:20px 1fr 48px 48px;gap:0 10px;align-items:center;min-height:60px;cursor:pointer;opacity:{{ s.op }}">
+<div style="position:relative;align-self:stretch;display:grid;place-items:center"><div style="position:absolute;left:9px;top:{{ s.lt }};bottom:{{ s.lb }};border-left:2px dashed #b8cdf8"></div><div style="position:relative;width:{{ s.ms }}px;height:{{ s.ms }}px;border-radius:50%;background:{{ s.mbg }};border:{{ s.mbw }} solid {{ s.mbd }}"></div></div>
+<div style="min-width:0"><div style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.name }}</div><div style="font-size:12px;color:#5b6574">{{ s.code }} · {{ s.meta }}</div></div>
+<span style="text-align:right;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:#5b6574">{{ s.arr }}</span>
+<span style="text-align:right;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums">{{ s.dep }}</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Related trains</span></div>
+<div style="background:#f1f4f8;border-radius:20px;overflow:hidden"><sc-for list="{{ tr.related }}" as="x" hint-placeholder-count="2"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:8px 14px;border-bottom:1px solid #e6eaf0;cursor:pointer" style-hover="background:#e9edf2"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.01em">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;letter-spacing:-.01em">{{ x.title }}</div><div style="font-size:13px;color:#5b6574;margin-top:1px">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+<div style="margin:16px 4px 0;font-size:12px;color:#7a8494">Timetable v2026.10.2 · Last verified 21 Oct 2026 · Sample data</div>
+<div style="margin-top:10px;padding:14px;border-radius:18px;background:#e8f0fe;color:#1d4fb8;font-size:13px;display:flex;gap:10px;line-height:1.45"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg><span>Scheduled timings only. This is not live running status or the train's current position.</span></div>
+</sc-if>
+
+<sc-if value="{{ isStation }}" hint-placeholder-val="{{ false }}">
+<div style="margin-top:10px"><div style="background:#f1f4f8;border-radius:20px;overflow:hidden"><sc-for list="{{ st.kv }}" as="k" hint-placeholder-count="4"><div onClick="{{ k.open }}" style="display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:46px;padding:0 14px;border-bottom:1px solid #e6eaf0;font-size:14px;cursor:{{ k.cur }}"><span style="color:#5b6574">{{ k.k }}</span><span style="font-weight:600;text-align:right;color:{{ k.color }}">{{ k.v }}</span></div></sc-for></div></div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Trains serving</span><span style="font-size:13px;color:#5b6574">{{ st.count }}</span></div>
+<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px"><sc-for list="{{ st.dayChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" style="height:40px;min-width:44px;padding:0 14px;flex:none;border-radius:20px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button></sc-for></div>
+<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px"><sc-for list="{{ st.dirChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" style="height:40px;min-width:44px;padding:0 14px;flex:none;border-radius:20px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button></sc-for><sc-for list="{{ st.typeChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" style="height:40px;min-width:44px;padding:0 14px;flex:none;border-radius:20px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button></sc-for></div>
+<button onClick="{{ toggleNow }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:0 4px;border:0;background:transparent;font-family:'Inter',system-ui,sans-serif;font-size:14px;cursor:pointer;color:#0f1722;text-align:left"><span>Upcoming after {{ st.now }}<span style="display:block;font-size:12px;color:#7a8494">Device clock · scheduled times</span></span><div style="width:46px;height:28px;border-radius:14px;background:{{ st.nowTag }};position:relative;flex:none;transition:background .2s"><div style="position:absolute;top:3px;left:{{ st.nowKnob }};width:22px;height:22px;border-radius:11px;background:#fff;box-shadow:0 1px 3px rgba(15,23,34,.25);transition:left .2s"></div></div></button>
+<div style="background:#f1f4f8;border-radius:20px;overflow:hidden">
+<sc-for list="{{ st.trains }}" as="r" hint-placeholder-count="4">
+<div onClick="{{ r.open }}" style="display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:10px;align-items:center;min-height:64px;padding:8px 14px;border-bottom:1px solid #e6eaf0;cursor:pointer" style-hover="background:#e9edf2">
+<span style="font-size:18px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums">{{ r.time }}</span>
+<div style="min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.num }} · {{ r.name }}</div><div style="font-size:12px;color:#5b6574">{{ r.to }} · {{ r.days }}</div></div>
+<span style="display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:#fff;color:#4a5463;font-size:11px;font-weight:600">{{ r.type }}</span>
+</div>
+</sc-for>
+<sc-if value="{{ st.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:20px 14px;font-size:14px;color:#5b6574">No scheduled trains match these filters.</div></sc-if>
+</div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Connected lines</span></div>
+<div style="background:#f1f4f8;border-radius:20px;overflow:hidden"><sc-for list="{{ st.lines }}" as="x" hint-placeholder-count="2"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:8px 14px;border-bottom:1px solid #e6eaf0;cursor:pointer" style-hover="background:#e9edf2"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.01em">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;letter-spacing:-.01em">{{ x.title }}</div><div style="font-size:13px;color:#5b6574;margin-top:1px">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Nearby stations</span></div>
+<div style="background:#f1f4f8;border-radius:20px;overflow:hidden"><sc-for list="{{ st.nearby }}" as="x" hint-placeholder-count="2"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:8px 14px;border-bottom:1px solid #e6eaf0;cursor:pointer" style-hover="background:#e9edf2"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.01em">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;letter-spacing:-.01em">{{ x.title }}</div><div style="font-size:13px;color:#5b6574;margin-top:1px">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+</sc-if>
+
+<sc-if value="{{ isLine }}" hint-placeholder-val="{{ false }}">
+<div style="margin-top:10px"><div style="background:#f1f4f8;border-radius:20px;overflow:hidden"><sc-for list="{{ ln.kv }}" as="k" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:46px;padding:0 14px;border-bottom:1px solid #e6eaf0;font-size:14px"><span style="color:#5b6574">{{ k.k }}</span><span style="font-weight:600;text-align:right">{{ k.v }}</span></div></sc-for></div></div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Station sequence</span></div>
+<div style="background:#f1f4f8;border-radius:22px;padding:6px 14px">
+<sc-for list="{{ ln.seq }}" as="s" hint-placeholder-count="5">
+<div onClick="{{ s.open }}" style="display:grid;grid-template-columns:20px 1fr auto;gap:0 10px;align-items:center;min-height:52px;cursor:pointer">
+<div style="position:relative;align-self:stretch;display:grid;place-items:center"><div style="position:absolute;left:9px;top:{{ s.lt }};bottom:{{ s.lb }};border-left:2px dashed #b8cdf8"></div><div style="position:relative;width:14px;height:14px;border-radius:7px;background:#fff;border:3px solid #2b6ef2"></div></div>
+<div style="font-size:15px;font-weight:600">{{ s.name }} <span style="font-weight:500;color:#7a8494;font-size:12px">{{ s.code }}</span></div>
+<span style="font-size:13px;color:#5b6574">{{ s.km }}</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Trains along this line</span></div>
+<div style="background:#f1f4f8;border-radius:20px;overflow:hidden"><sc-for list="{{ ln.trains }}" as="x" hint-placeholder-count="2"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:8px 14px;border-bottom:1px solid #e6eaf0;cursor:pointer" style-hover="background:#e9edf2"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.01em">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;letter-spacing:-.01em">{{ x.title }}</div><div style="font-size:13px;color:#5b6574;margin-top:1px">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+</sc-if>
+
+<sc-if value="{{ isBetween }}" hint-placeholder-val="{{ false }}"><div style="margin-top:10px"><sc-for list="{{ between.rows }}" as="r" hint-placeholder-count="2"><div onClick="{{ r.open }}" style="background:#f1f4f8;border-radius:20px;padding:14px 16px;margin-bottom:8px;cursor:pointer" style-hover="box-shadow:0 0 0 2px #cddcfd"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600">{{ r.num }} · {{ r.name }}</span><span style="display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:#eef1f5;color:#4a5463;font-size:12px;font-weight:600;white-space:nowrap">{{ r.type }}</span></div><div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ r.dep }}</span><div style="flex:1;border-top:2px dashed #b8cdf8"></div><span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:13px;background:#e8f0fe;color:#2b6ef2;font-size:12px;font-weight:600;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="3" rx="2"></rect><path d="M4 11h16"></path><path d="M12 3v8"></path><path d="m8 19-2 3"></path><path d="m18 22-2-3"></path><path d="M8 15h.01"></path><path d="M16 15h.01"></path></svg>{{ r.dur }}</span><div style="flex:1;border-top:2px dashed #b8cdf8"></div><span style="font-size:24px;font-weight:700;letter-spacing:-.02em;white-space:nowrap">{{ r.arr }}</span></div><div style="font-size:13px;color:#5b6574;margin-top:6px">{{ r.km }} · {{ r.days }}</div></div></sc-for></div></sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSearch }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:47px 0 0 0;z-index:25;background:#f4f6f9;overflow-y:auto;padding:14px 16px 120px"><h1 style="font-family:'Inter',system-ui,sans-serif;margin:0 0 14px;font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Search</h1>
+<div style="display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:16px;background:#e6eaf0;margin-bottom:14px">
+<button onClick="{{ modeAll }}" style="height:42px;border:0;border-radius:12px;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer;background:{{ seg.aBg }};color:{{ seg.aFg }};box-shadow:{{ seg.aSh }}">Everything</button>
+<button onClick="{{ modeBetween }}" style="height:42px;border:0;border-radius:12px;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer;background:{{ seg.bBg }};color:{{ seg.bFg }};box-shadow:{{ seg.bSh }}">Between stations</button>
+</div>
+<sc-if value="{{ modeIsAll }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;gap:10px;height:54px;padding:0 16px;border-radius:27px;background:#fff;box-shadow:0 2px 10px rgba(15,23,34,.06);color:#7a8494"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><input value="{{ q }}" onChange="{{ setQ }}" onKeyDown="{{ qKey }}" placeholder="Train number, name, station code…" style="flex:1;min-width:0;height:100%;border:0;outline:none;background:transparent;font-family:'Inter',system-ui,sans-serif;font-size:16px;color:#0f1722"></input></div>
+<sc-if value="{{ qEmpty }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Recent</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ recents }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.pick }}" style="height:40px;padding:0 16px;border-radius:20px;border:0;background:#fff;box-shadow:0 1px 3px rgba(15,23,34,.06);font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:500;cursor:pointer;color:#0f1722" style-hover="background:#e8f0fe">{{ r.label }}</button></sc-for></div>
+<div style="font-size:13px;color:#7a8494;margin:16px 4px 0;line-height:1.5">Matches trains, stations, zones, divisions and lines. Spelling mistakes are tolerated.</div>
+</sc-if>
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">{{ g.label }}</span><span style="font-size:13px;color:#5b6574">{{ g.count }}</span></div>
+<div style="background:#fff;border-radius:20px;overflow:hidden"><sc-for list="{{ g.items }}" as="x" hint-placeholder-count="2"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:8px 14px;border-bottom:1px solid #eef1f5;cursor:pointer" style-hover="background:#f7f9fc"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.01em">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;letter-spacing:-.01em">{{ x.title }}</div><div style="font-size:13px;color:#5b6574;margin-top:1px">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+</sc-for>
+<sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><div style="padding:24px 4px;font-size:14px;color:#5b6574">No matches for “{{ q }}”. Try a train number or a station code.</div></sc-if>
+</sc-if>
+<sc-if value="{{ modeIsBetween }}" hint-placeholder-val="{{ false }}">
+<div style="position:relative;background:#fff;border-radius:22px;padding:6px 16px;box-shadow:0 2px 10px rgba(15,23,34,.05)">
+<div style="display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;min-height:62px;border-bottom:1px solid #eef1f5;padding-right:52px"><div style="width:18px;height:18px;border-radius:9px;border:2px dashed #0fa390"></div><label style="display:block"><span style="display:block;font-size:12px;color:#7a8494">From</span>{{ fromSelect }}</label></div>
+<div style="display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:center;min-height:62px;padding-right:52px"><div style="width:18px;height:18px;border-radius:9px;background:#2b6ef2;box-shadow:0 0 0 4px #cddcfd"></div><label style="display:block"><span style="display:block;font-size:12px;color:#7a8494">To</span>{{ toSelect }}</label></div>
+<button onClick="{{ swap }}" aria-label="Swap stations" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:22px;border:0;background:#e8f0fe;color:#2b6ef2;cursor:pointer;display:grid;place-items:center" style-hover="background:#d8e5fd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"></path><path d="M17 20V4"></path><path d="m3 8 4-4 4 4"></path><path d="M7 4v16"></path></svg></button>
+</div>
+<div style="font-size:13px;font-weight:600;color:#5b6574;margin:16px 4px 8px">Day</div>
+<div style="display:flex;gap:6px;overflow-x:auto"><sc-for list="{{ bDayChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" style="height:40px;min-width:44px;padding:0 14px;flex:none;border-radius:20px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button></sc-for></div>
+<div style="font-size:13px;font-weight:600;color:#5b6574;margin:14px 4px 8px">Departure</div>
+<div style="display:flex;gap:6px;overflow-x:auto"><sc-for list="{{ bTimeChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" style="height:40px;min-width:44px;padding:0 14px;flex:none;border-radius:20px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button></sc-for></div>
+<div style="font-size:13px;font-weight:600;color:#5b6574;margin:14px 4px 8px">Train type</div>
+<div style="display:flex;gap:6px;overflow-x:auto"><sc-for list="{{ bTypeChips }}" as="c" hint-placeholder-count="4"><button onClick="{{ c.pick }}" style="height:40px;min-width:44px;padding:0 14px;flex:none;border-radius:20px;border:1px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }};font-family:'Inter',system-ui,sans-serif;font-size:13px;font-weight:600;cursor:pointer">{{ c.label }}</button></sc-for></div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">{{ between.title }}</span><span style="font-size:13px;color:#5b6574">{{ between.count }}</span></div>
+<sc-for list="{{ between.rows }}" as="r" hint-placeholder-count="2"><div onClick="{{ r.open }}" style="background:#fff;border-radius:20px;padding:14px 16px;margin-bottom:8px;cursor:pointer" style-hover="box-shadow:0 0 0 2px #cddcfd"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600">{{ r.num }} · {{ r.name }}</span><span style="display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:#eef1f5;color:#4a5463;font-size:12px;font-weight:600;white-space:nowrap">{{ r.type }}</span></div><div style="display:flex;align-items:center;gap:10px;margin-top:10px"><span style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ r.dep }}</span><div style="flex:1;border-top:2px dashed #b8cdf8"></div><span style="display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:13px;background:#e8f0fe;color:#2b6ef2;font-size:12px;font-weight:600;white-space:nowrap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="3" rx="2"></rect><path d="M4 11h16"></path><path d="M12 3v8"></path><path d="m8 19-2 3"></path><path d="m18 22-2-3"></path><path d="M8 15h.01"></path><path d="M16 15h.01"></path></svg>{{ r.dur }}</span><div style="flex:1;border-top:2px dashed #b8cdf8"></div><span style="font-size:24px;font-weight:700;letter-spacing:-.02em;white-space:nowrap">{{ r.arr }}</span></div><div style="font-size:13px;color:#5b6574;margin-top:6px">{{ r.km }} · {{ r.days }}</div></div></sc-for>
+<sc-if value="{{ between.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:20px 4px;font-size:14px;color:#5b6574">No direct scheduled trains between these stations with the current filters.</div></sc-if>
+<sc-if value="{{ between.any }}" hint-placeholder-val="{{ false }}"><button onClick="{{ showBetween }}" style="width:100%;height:52px;margin-top:8px;border-radius:16px;border:0;background:#2b6ef2;color:#fff;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#1f5ee0">Show {{ between.count }} on map</button></sc-if>
+</sc-if></div></sc-if>
+
+<sc-if value="{{ isExplore }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:47px 0 0 0;z-index:25;background:#f4f6f9;overflow-y:auto;padding:14px 16px 120px"><sc-if value="{{ ex.canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ exBack }}" style="height:40px;display:flex;align-items:center;gap:4px;border:0;background:transparent;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:500;padding:0;margin-left:-4px;cursor:pointer;color:#2b6ef2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>{{ ex.crumb }}</button></sc-if>
+<div style="font-size:13px;font-weight:600;color:#2b6ef2">{{ ex.kicker }}</div>
+<h1 style="font-family:'Inter',system-ui,sans-serif;margin:2px 0 14px;font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1.12">{{ ex.title }}</h1>
+<sc-if value="{{ ex.hasStats }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border-radius:22px;padding:14px 0;box-shadow:0 2px 10px rgba(15,23,34,.05)"><sc-for list="{{ ex.stats }}" as="t" hint-placeholder-count="4"><div style="padding:0 12px;border-left:{{ t.bl }}"><div style="font-size:24px;font-weight:700;letter-spacing:-.02em">{{ t.n }}</div><div style="font-size:12px;color:#5b6574">{{ t.l }}</div></div></sc-for></div>
+<div style="font-size:13px;color:#5b6574;margin:10px 4px 0">{{ ex.meta }}</div>
+<button onClick="{{ ex.onMap }}" style="width:100%;height:50px;margin-top:12px;border-radius:16px;border:0;background:#e8f0fe;color:#2b6ef2;font-family:'Inter',system-ui,sans-serif;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" style-hover="background:#d8e5fd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>View on map</button>
+</sc-if>
+<sc-for list="{{ ex.sections }}" as="g" hint-placeholder-count="2">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">{{ g.label }}</span><span style="font-size:13px;color:#5b6574">{{ g.count }}</span></div>
+<div style="background:#fff;border-radius:20px;overflow:hidden"><sc-for list="{{ g.items }}" as="x" hint-placeholder-count="3"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 14px;border-bottom:1px solid #eef1f5;cursor:pointer;opacity:{{ x.op }}" style-hover="background:#f7f9fc"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">{{ x.title }}</div><div style="font-size:13px;color:#5b6574">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+</sc-for></div></sc-if>
+
+<sc-if value="{{ isSaved }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:47px 0 0 0;z-index:25;background:#f4f6f9;overflow-y:auto;padding:14px 16px 120px"><h1 style="font-family:'Inter',system-ui,sans-serif;margin:0 0 14px;font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Saved</h1>
+<div style="font-size:14px;color:#5b6574;margin:-6px 4px 0">Stored on this device. No account needed.</div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Favourites</span><span style="font-size:13px;color:#5b6574">{{ savedFavCount }}</span></div>
+<div style="background:#fff;border-radius:20px;overflow:hidden"><sc-for list="{{ savedFavs }}" as="x" hint-placeholder-count="2"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:8px 14px;border-bottom:1px solid #eef1f5;cursor:pointer" style-hover="background:#f7f9fc"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.01em">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;letter-spacing:-.01em">{{ x.title }}</div><div style="font-size:13px;color:#5b6574;margin-top:1px">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+<sc-if value="{{ favEmpty }}" hint-placeholder-val="{{ true }}"><div style="padding:18px;border-radius:20px;background:#fff;font-size:14px;color:#5b6574">Nothing saved yet. Tap the bookmark on any train or station.</div></sc-if>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Recently viewed</span><span style="font-size:13px;color:#5b6574">{{ savedRecentCount }}</span></div>
+<div style="background:#fff;border-radius:20px;overflow:hidden"><sc-for list="{{ savedRecent }}" as="x" hint-placeholder-count="2"><div onClick="{{ x.open }}" style="display:flex;align-items:center;gap:12px;min-height:62px;padding:8px 14px;border-bottom:1px solid #eef1f5;cursor:pointer" style-hover="background:#f7f9fc"><div style="min-width:46px;height:36px;padding:0 8px;border-radius:11px;background:{{ x.bb }};color:{{ x.bf }};display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.01em">{{ x.code }}</div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600;letter-spacing:-.01em">{{ x.title }}</div><div style="font-size:13px;color:#5b6574;margin-top:1px">{{ x.sub }}</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div></sc-for></div>
+<sc-if value="{{ recentEmpty }}" hint-placeholder-val="{{ true }}"><div style="padding:18px;border-radius:20px;background:#fff;font-size:14px;color:#5b6574">Trains, stations and lines you open will appear here.</div></sc-if></div></sc-if>
+
+<sc-if value="{{ isInfo }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;inset:47px 0 0 0;z-index:25;background:#f4f6f9;overflow-y:auto;padding:14px 16px 120px"><h1 style="font-family:'Inter',system-ui,sans-serif;margin:0 0 14px;font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.1">Info</h1>
+<div style="padding:20px;border-radius:24px;background:#2b6ef2;color:#fff">
+<div style="width:40px;height:40px;border-radius:20px;background:rgba(255,255,255,.18);display:grid;place-items:center;margin-bottom:12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+<div style="font-size:22px;font-weight:700;letter-spacing:-.02em">Scheduled, not live</div>
+<div style="font-size:14px;margin-top:6px;line-height:1.5">Railyn shows planned routes and timetabled times. It does not show where a train is right now, delays, cancellations or platform changes.</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700">Coverage</span><span style="height:24px;padding:0 10px;border-radius:12px;background:#dff5f0;color:#0b7f70;font-size:12px;font-weight:600;display:inline-flex;align-items:center">Prototype</span></div>
+<div style="background:#fff;border-radius:20px;overflow:hidden"><sc-for list="{{ infoKv }}" as="k" hint-placeholder-count="5"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:48px;padding:0 14px;border-bottom:1px solid #eef1f5;font-size:14px"><span style="color:#5b6574">{{ k.k }}</span><span style="font-weight:600;text-align:right">{{ k.v }}</span></div></sc-for></div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 4px 10px"><span style="font-size:17px;font-weight:700;letter-spacing:-.01em">Data sources</span></div>
+<div style="background:#fff;border-radius:20px;overflow:hidden"><sc-for list="{{ sources }}" as="x" hint-placeholder-count="3"><div style="padding:12px 14px;border-bottom:1px solid #eef1f5"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:15px;font-weight:600">{{ x.title }}</span><span style="height:24px;padding:0 10px;border-radius:12px;background:#eef1f5;color:#4a5463;font-size:12px;font-weight:600;display:inline-flex;align-items:center">{{ x.lic }}</span></div><div style="font-size:13px;color:#5b6574;margin-top:3px">{{ x.sub }}</div></div></sc-for></div></div></sc-if>
+
+<div style="position:absolute;z-index:30;left:50%;transform:translateX(-50%);bottom:26px;height:64px;padding:0 8px;border-radius:32px;background:#0c111a;box-shadow:0 12px 32px rgba(12,17,26,.35);display:flex;align-items:center;gap:4px">
+<button onClick="{{ go.map }}" aria-label="map" style="width:52px;height:48px;border-radius:24px;display:grid;place-items:center;border:0;background:{{ navBar.map }};cursor:pointer;color:{{ navF.map }};transition:background .2s"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg></button>
+<button onClick="{{ go.search }}" aria-label="search" style="width:52px;height:48px;border-radius:24px;display:grid;place-items:center;border:0;background:{{ navBar.search }};cursor:pointer;color:{{ navF.search }};transition:background .2s"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+<button onClick="{{ go.explore }}" aria-label="explore" style="width:52px;height:48px;border-radius:24px;display:grid;place-items:center;border:0;background:{{ navBar.explore }};cursor:pointer;color:{{ navF.explore }};transition:background .2s"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"></path></svg></button>
+<button onClick="{{ go.saved }}" aria-label="saved" style="width:52px;height:48px;border-radius:24px;display:grid;place-items:center;border:0;background:{{ navBar.saved }};cursor:pointer;color:{{ navF.saved }};transition:background .2s"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path></svg></button>
+<button onClick="{{ go.info }}" aria-label="info" style="width:52px;height:48px;border-radius:24px;display:grid;place-items:center;border:0;background:{{ navBar.info }};cursor:pointer;color:{{ navF.info }};transition:background .2s"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg></button>
+</div>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;z-index:50;top:118px;left:16px;right:16px;padding:14px 16px;border-radius:18px;background:#0c111a;color:#fff;font-size:14px;font-weight:500;box-shadow:0 12px 32px rgba(12,17,26,.3)">{{ toast }}</div></sc-if>
+<div style="position:absolute;z-index:60;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#0f1722;pointer-events:none"></div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:410,&quot;height&quot;:864},&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Docked&quot;,&quot;Floating&quot;],&quot;default&quot;:&quot;Docked&quot;,&quot;tsType&quot;:&quot;'Docked'|'Floating'&quot;},&quot;startTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;map&quot;,&quot;search&quot;,&quot;explore&quot;,&quot;saved&quot;,&quot;info&quot;],&quot;default&quot;:&quot;map&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;startTrain&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;16301&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const H = 844;
+const DAYN = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYL = ['M','T','W','T','F','S','S'];
+const S = {
+  NCJ:['Nagercoil Jn',8.1777,77.4110,'TVC',1], TVC:['Thiruvananthapuram Central',8.4875,76.9525,'TVC',0],
+  QLN:['Kollam Jn',8.8862,76.5950,'TVC',1], KYJ:['Kayamkulam Jn',9.1747,76.5050,'TVC',1],
+  CNGR:['Chengannur',9.3196,76.6115,'TVC',0], ALLP:['Alappuzha',9.4919,76.3305,'TVC',0],
+  KTYM:['Kottayam',9.5960,76.5285,'TVC',0], ERS:['Ernakulam Jn',9.9696,76.2913,'TVC',1],
+  AWY:['Aluva',10.1080,76.3533,'TVC',0], TCR:['Thrissur',10.5155,76.2094,'TVC',0],
+  SRR:['Shoranur Jn',10.7600,76.2717,'PGT',1], PGT:['Palakkad Jn',10.7964,76.6521,'PGT',1],
+  CBE:['Coimbatore Jn',10.9965,76.9670,'SA',1], TIR:['Tirur',10.9140,75.9214,'PGT',0],
+  CLT:['Kozhikode',11.2478,75.7804,'PGT',0], CAN:['Kannur',11.8726,75.3700,'PGT',0],
+  KGQ:['Kasaragod',12.4960,74.9877,'PGT',0], MAQ:['Mangaluru Central',12.8639,74.8392,'PGT',0],
+  UD:['Udupi',13.3409,74.7539,'KAWR',0], KAWR:['Karwar',14.8017,74.1307,'KAWR',0],
+  MAO:['Madgaon Jn',15.2669,73.9807,'KAWR',1]
+};
+const DIV = { TVC:{name:'Thiruvananthapuram',zone:'SR',hq:'Thiruvananthapuram'}, PGT:{name:'Palakkad',zone:'SR',hq:'Palakkad'}, SA:{name:'Salem',zone:'SR',hq:'Salem'}, KAWR:{name:'Karwar Region',zone:'KR',hq:'Karwar'} };
+const ZONES = [
+  {id:'SR',name:'Southern Railway',hq:'Chennai',covered:true,org:false},
+  {id:'CR',name:'Central Railway',hq:'Mumbai CSMT',covered:false,org:false},
+  {id:'NR',name:'Northern Railway',hq:'New Delhi',covered:false,org:false},
+  {id:'SWR',name:'South Western Railway',hq:'Hubballi',covered:false,org:false},
+  {id:'KR',name:'Konkan Railway',hq:'Navi Mumbai',covered:true,org:true}
+];
+const LINES = {
+  L1:{name:'Nagercoil–Ernakulam via Kottayam',seq:['NCJ','TVC','QLN','KYJ','CNGR','KTYM','ERS'],zone:'SR'},
+  L2:{name:'Kayamkulam–Ernakulam via Alappuzha',seq:['KYJ','ALLP','ERS'],zone:'SR'},
+  L3:{name:'Ernakulam–Shoranur',seq:['ERS','AWY','TCR','SRR'],zone:'SR'},
+  L4:{name:'Shoranur–Coimbatore',seq:['SRR','PGT','CBE'],zone:'SR'},
+  L5:{name:'Shoranur–Mangaluru',seq:['SRR','TIR','CLT','CAN','KGQ','MAQ'],zone:'SR'},
+  L6:{name:'Konkan Line (Mangaluru–Madgaon)',seq:['MAQ','UD','KAWR','MAO'],zone:'KR'}
+};
+const SPEED = {Superfast:62,Express:52,Intercity:50,Passenger:38};
+const RAW = [
+  ['16301','Coastal Express','Express',['TVC','QLN','KYJ','CNGR','KTYM','ERS','AWY','TCR','SRR','TIR','CLT','CAN','KGQ','MAQ'],[],14*60+15,[0,1,2,3,4,5,6],'16302'],
+  ['16302','Coastal Express','Express',['MAQ','KGQ','CAN','CLT','TIR','SRR','TCR','AWY','ERS','KTYM','CNGR','KYJ','QLN','TVC'],[],16*60+30,[0,1,2,3,4,5,6],'16301'],
+  ['12601','Western Ghats SF','Superfast',['ERS','AWY','TCR','SRR','PGT','CBE'],['AWY'],7*60+10,[0,2,4],'12602'],
+  ['12602','Western Ghats SF','Superfast',['CBE','PGT','SRR','TCR','AWY','ERS'],['AWY'],15*60+40,[1,3,5],'12601'],
+  ['16605','Backwater Intercity','Intercity',['TVC','QLN','KYJ','ALLP','ERS'],[],6*60,[0,1,2,3,4,5,6],'16606'],
+  ['16606','Backwater Intercity','Intercity',['ERS','ALLP','KYJ','QLN','TVC'],[],17*60+20,[0,1,2,3,4,5,6],'16605'],
+  ['10215','Konkan Link Express','Express',['ERS','AWY','TCR','SRR','TIR','CLT','CAN','KGQ','MAQ','UD','KAWR','MAO'],['TIR','KGQ'],20*60+30,[1,5],'10216'],
+  ['10216','Konkan Link Express','Express',['MAO','KAWR','UD','MAQ','KGQ','CAN','CLT','TIR','SRR','TCR','AWY','ERS'],['TIR','KGQ'],9*60,[2,6],'10215'],
+  ['56701','Southern Passenger','Passenger',['NCJ','TVC','QLN','KYJ','CNGR','KTYM','ERS'],[],4*60+45,[0,1,2,3,4,5,6],null]
+];
+const hav = (a,b) => { const A=S[a],B=S[b],r=Math.PI/180; const dl=(B[1]-A[1])*r, dn=(B[2]-A[2])*r; const x=Math.sin(dl/2)**2+Math.cos(A[1]*r)*Math.cos(B[1]*r)*Math.sin(dn/2)**2; return 12742*Math.asin(Math.sqrt(x)); };
+const pad = n => String(n).padStart(2,'0');
+const fm = m => m==null ? '—' : pad(Math.floor(m/60)%24)+':'+pad(m%60);
+const dur = m => Math.floor(m/60)+'h '+pad(m%60)+'m';
+const daysText = d => d.length===7 ? 'Daily' : d.map(i=>DAYN[i]).join(' ');
+const TR = {};
+RAW.forEach(([num,name,type,seq,pass,start,days,pair])=>{
+  let t=start, km=0; const stops=[];
+  seq.forEach((c,i)=>{
+    if(i>0){ const d=hav(seq[i-1],c)*1.22; km+=d; t=Math.ceil((t+d/SPEED[type]*60)/5)*5; }
+    const p=pass.includes(c), first=i===0, last=i===seq.length-1;
+    const halt = first||last||p ? 0 : (S[c][4]||['ERS','CLT','TCR','TVC'].includes(c) ? 5 : 2);
+    const arr = first ? null : t; t+=halt; const dep = last ? null : t;
+    stops.push({code:c,arr,dep,halt,km:Math.round(km),day:Math.floor((arr??dep)/1440)+1,pass:p});
+  });
+  const L=stops[stops.length-1];
+  TR[num]={num,name,type,stops,start,days,pair,src:seq[0],dst:L.code,km:L.km,mins:L.arr-start};
+});
+const stName = c => S[c][0];
+const zoneOf = c => DIV[S[c][3]].zone;
+const zoneById = id => ZONES.find(z=>z.id===id);
+const fuzzy = (q,t) => {
+  t=t.toLowerCase(); if(t.startsWith(q)) return 4; if(t.includes(q)) return 3;
+  const lev=(a,b)=>{const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length];};
+  if(q.length>=3) for(const w of t.split(/[\s–-]+/)) if(lev(q,w.slice(0,q.length))<=(q.length>5?2:1)) return 1;
+  return 0;
+};
+
+class Component extends DCLogic {
+  state = { tab:this.props.startTab||'map', stack:[], snap:'half', dragTop:null, q:'', sMode:'all', from:'ERS', to:'CLT', bDay:-1, bTime:'Any', bType:'All', recents:['Coastal Express','ERS','Konkan'], favs:[], viewed:[], ex:[], ttAll:false, stDay:-1, stDir:'Any', stType:'All', stNow:false, layers:false, cov:true, labels:true, toast:null, focus:null };
+  mapRef = React.createRef();
+
+  componentDidMount(){
+    try { const d=JSON.parse(localStorage.getItem('railyn-proto-v2')||'{}'); this.setState({favs:d.favs||[],viewed:d.viewed||[],recents:d.recents||this.state.recents}); } catch(e){}
+    const t=this.props.startTrain ?? '16301';
+    if(TR[t] && (this.props.startTab||'map')==='map') this.setState({stack:[{kind:'train',id:t}]});
+    this.waitMap();
+  }
+  componentWillUnmount(){ this.map && this.map.remove(); clearTimeout(this.tt); }
+  componentDidUpdate(){ this.syncMap(); }
+  persist(p){ const s={...this.state,...p}; try{ localStorage.setItem('railyn-proto-v2',JSON.stringify({favs:s.favs,viewed:s.viewed,recents:s.recents})); }catch(e){} }
+
+  waitMap(){ if(window.maplibregl && this.mapRef.current) this.initMap(); else this.wt=setTimeout(()=>this.waitMap(),120); }
+  initMap(){
+    this.c={ink:'#3b4657',acc:'#2b6ef2',bg:'#ffffff',mute:'#9aa3b2',sec:'#0fa390'};
+    const m=this.map=new maplibregl.Map({container:this.mapRef.current,style:'https://tiles.openfreemap.org/styles/positron',center:[76.3,10.3],zoom:6.3,attributionControl:false});
+    const fc=f=>({type:'FeatureCollection',features:f});
+    m.on('load',()=>{
+      const C=this.c;
+      m.addSource('cov',{type:'geojson',data:fc([{type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[73.7,7.9],[77.7,7.9],[77.7,15.5],[73.7,15.5],[73.7,7.9]]]}}])});
+      m.addSource('lines',{type:'geojson',data:fc(Object.entries(LINES).map(([id,l])=>({type:'Feature',properties:{id,kr:l.zone==='KR'?1:0},geometry:{type:'LineString',coordinates:l.seq.map(c=>[S[c][2],S[c][1]])}})))});
+      m.addSource('stations',{type:'geojson',data:fc(Object.entries(S).map(([code,s])=>({type:'Feature',properties:{code,name:s[0],jn:s[4]},geometry:{type:'Point',coordinates:[s[2],s[1]]}})))});
+      ['route','rstops','sel'].forEach(id=>m.addSource(id,{type:'geojson',data:fc([])}));
+      m.addLayer({id:'cov-fill',type:'fill',source:'cov',paint:{'fill-color':C.acc,'fill-opacity':0.035}});
+      m.addLayer({id:'cov-line',type:'line',source:'cov',paint:{'line-color':C.acc,'line-width':1.5,'line-dasharray':[3,2]}});
+      m.addLayer({id:'lines',type:'line',source:'lines',filter:['==',['get','kr'],0],paint:{'line-color':C.ink,'line-width':['interpolate',['linear'],['zoom'],5,1.5,10,3.5]}});
+      m.addLayer({id:'lines-kr',type:'line',source:'lines',filter:['==',['get','kr'],1],paint:{'line-color':C.mute,'line-width':['interpolate',['linear'],['zoom'],5,1.5,10,3.5],'line-dasharray':[1,1.2]}});
+      m.addLayer({id:'lines-hit',type:'line',source:'lines',paint:{'line-color':C.ink,'line-opacity':0,'line-width':16}});
+      m.addLayer({id:'route-glow',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':C.acc,'line-opacity':0.28,'line-blur':6,'line-width':['interpolate',['linear'],['zoom'],5,10,10,18]}});
+      m.addLayer({id:'route',type:'line',source:'route',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':C.acc,'line-width':['interpolate',['linear'],['zoom'],5,3.5,10,6]}});
+      m.addLayer({id:'stn-all',type:'circle',source:'stations',minzoom:7,filter:['==',['get','jn'],0],paint:{'circle-radius':4,'circle-color':C.bg,'circle-stroke-color':C.ink,'circle-stroke-width':2}});
+      m.addLayer({id:'stn-jn',type:'circle',source:'stations',filter:['==',['get','jn'],1],paint:{'circle-radius':['interpolate',['linear'],['zoom'],5,4,10,7],'circle-color':C.bg,'circle-stroke-color':C.ink,'circle-stroke-width':2.5}});
+      m.addLayer({id:'rstops',type:'circle',source:'rstops',paint:{'circle-radius':5,'circle-color':C.bg,'circle-stroke-color':C.acc,'circle-stroke-width':2.5}});
+      m.addLayer({id:'sel-halo',type:'circle',source:'sel',paint:{'circle-radius':16,'circle-color':['case',['==',['get','o'],1],C.sec,C.acc],'circle-opacity':0.18}});
+      m.addLayer({id:'sel',type:'circle',source:'sel',paint:{'circle-radius':8,'circle-color':['case',['==',['get','o'],1],C.sec,C.acc],'circle-stroke-color':C.bg,'circle-stroke-width':2.5}});
+      m.addLayer({id:'stn-label',type:'symbol',source:'stations',filter:['any',['==',['get','jn'],1],['>=',['zoom'],7.5]],layout:{'text-field':['get','name'],'text-font':['Noto Sans Bold'],'text-size':11,'text-offset':[0.9,0],'text-anchor':'left','text-optional':true},paint:{'text-color':C.ink,'text-halo-color':C.bg,'text-halo-width':1.5}});
+      m.on('click',e=>{
+        const b=[[e.point.x-10,e.point.y-10],[e.point.x+10,e.point.y+10]];
+        let f=m.queryRenderedFeatures(b,{layers:['sel','rstops','stn-jn','stn-all'].filter(l=>m.getLayer(l))}).filter(x=>x.properties.code);
+        if(f.length) return this.open('station',f[0].properties.code,true);
+        f=m.queryRenderedFeatures(b,{layers:['lines-hit']}); if(f.length) this.open('line',f[0].properties.id,true);
+      });
+      ['stn-jn','stn-all','lines-hit'].forEach(l=>{m.on('mouseenter',l,()=>m.getCanvas().style.cursor='pointer');m.on('mouseleave',l,()=>m.getCanvas().style.cursor='');});
+      this.ready=true; this.lastKey=null; this.syncMap();
+    });
+  }
+  syncMap(){
+    const m=this.map; if(!this.ready) return;
+    const s=this.state, e=s.stack[s.stack.length-1], fc=f=>({type:'FeatureCollection',features:f});
+    const pt=c=>[S[c][2],S[c][1]], ls=cs=>({type:'Feature',properties:{},geometry:{type:'LineString',coordinates:cs}}), pf=c=>({type:'Feature',properties:{code:c},geometry:{type:'Point',coordinates:pt(c)}});
+    m.setLayoutProperty('cov-fill','visibility',s.cov?'visible':'none'); m.setLayoutProperty('cov-line','visibility',s.cov?'visible':'none');
+    m.setLayoutProperty('stn-label','visibility',s.labels?'visible':'none');
+    const key=JSON.stringify([e,s.focus,s.tab==='map']); if(key===this.lastKey) return; this.lastKey=key;
+    let route=[],stops=[],sel=[],fit=[];
+    if(e&&e.kind==='train'){ const t=TR[e.id]; const cs=t.stops.map(x=>x.code); route=[ls(cs.map(pt))]; stops=t.stops.filter(x=>!x.pass).map(x=>pf(x.code)); sel=[{...pf(t.src),properties:{code:t.src,o:1}},pf(t.dst)]; fit=cs; }
+    else if(e&&e.kind==='line'){ const l=LINES[e.id]; route=[ls(l.seq.map(pt))]; stops=l.seq.map(pf); fit=l.seq; }
+    else if(e&&e.kind==='station'){ sel=[{...pf(e.id),properties:{code:e.id,o:1}}]; fit=[e.id]; }
+    else if(e&&e.kind==='between'){ this.betweenRows(e).forEach(r=>{ const cs=r.t.stops.slice(r.i,r.j+1).map(x=>x.code); route.push(ls(cs.map(pt))); }); sel=[{...pf(e.from),properties:{code:e.from,o:1}},pf(e.to)]; fit=[e.from,e.to]; }
+    else if(s.focus){ sel=s.focus.map(pf); fit=s.focus; }
+    m.getSource('route').setData(fc(route)); const rc=e&&e.kind==='line'?'#7a5af5':this.c.acc; m.setPaintProperty('route','line-color',rc); m.setPaintProperty('route-glow','line-color',rc); m.setPaintProperty('rstops','circle-stroke-color',rc); m.getSource('rstops').setData(fc(stops)); m.getSource('sel').setData(fc(sel));
+    if(!fit.length || s.tab!=='map') return;
+    const bottom = e ? H-400+16 : 120;
+    if(fit.length===1) m.easeTo({center:pt(fit[0]),zoom:9.5,padding:{top:120,bottom,left:30,right:30},duration:700});
+    else { const xs=fit.map(c=>S[c][2]), ys=fit.map(c=>S[c][1]); m.fitBounds([[Math.min(...xs),Math.min(...ys)],[Math.max(...xs),Math.max(...ys)]],{padding:{top:120,bottom,left:40,right:70},duration:700,maxZoom:10}); }
+  }
+
+  open(kind,id,replace,extra){
+    const ent={kind,id,...(extra||{})};
+    this.setState(s=>{
+      const stack = replace ? [ent] : [...s.stack, ent];
+      const vk=kind+':'+id, viewed = kind==='between' ? s.viewed : [vk,...s.viewed.filter(x=>x!==vk)].slice(0,12);
+      this.persist({viewed});
+      return {tab:'map',stack,snap:s.snap==='peek'?'half':s.snap,viewed,focus:null,layers:false,ttAll:false};
+    });
+  }
+  flash(msg){ clearTimeout(this.tt); this.setState({toast:msg}); this.tt=setTimeout(()=>this.setState({toast:null}),2200); }
+  ent2row(k,id){
+    const r=this.ent2rowRaw(k,id); const c=k==='train'?['#e8f0fe','#2b6ef2']:k==='station'?['#dff5f0','#0b7f70']:k==='line'?['#efeafe','#5b3fd1']:['#fdf1dc','#a2620a']; r.bb=c[0]; r.bf=c[1]; return r;
+  }
+  ent2rowRaw(k,id){
+    const o=()=>this.open(k,id);
+    if(k==='train'){ const t=TR[id]; return {code:t.num,title:t.name,sub:`${stName(t.src)} → ${stName(t.dst)} · ${daysText(t.days)}`,open:o}; }
+    if(k==='station'){ const s=S[id]; return {code:id,title:s[0],sub:`${DIV[s[3]].name} Division · ${zoneById(zoneOf(id)).name}`,open:o}; }
+    if(k==='line'){ const l=LINES[id]; return {code:id,title:l.name,sub:`${l.seq.length} stations · ${zoneById(l.zone).name}`,open:o}; }
+    if(k==='zone'){ const z=zoneById(id); return {code:id,title:z.name,sub:'HQ '+z.hq,open:()=>this.setState({tab:'explore',ex:[{kind:'zone',id}]})}; }
+    if(k==='division'){ const d=DIV[id]; return {code:id,title:d.name+' Division',sub:zoneById(d.zone).name,open:()=>this.setState({tab:'explore',ex:[{kind:'zone',id:d.zone},{kind:'division',id}]})}; }
+  }
+  betweenRows(e){
+    return Object.values(TR).map(t=>{ const i=t.stops.findIndex(x=>x.code===e.from&&!x.pass), j=t.stops.findIndex(x=>x.code===e.to&&!x.pass); return {t,i,j}; })
+      .filter(r=>r.i>=0&&r.j>r.i)
+      .filter(r=>e.day==null||e.day<0||r.t.days.includes(e.day))
+      .filter(r=>!e.type||e.type==='All'||r.t.type===e.type)
+      .filter(r=>{ if(!e.time||e.time==='Any') return true; const h=(r.t.stops[r.i].dep%1440)/60; return e.time==='Morning'?h>=4&&h<12:e.time==='Afternoon'?h>=12&&h<18:(h>=18||h<4); })
+      .sort((a,b)=>a.t.stops[a.i].dep%1440-b.t.stops[b.i].dep%1440);
+  }
+  chip(label,on,pick){ return {label,pick,bg:on?'#2b6ef2':'#fff',fg:on?'#fff':'#0f1722',bd:on?'#2b6ef2':'#e3e7ee'}; }
+
+  renderVals(){
+    const s=this.state, fl=(this.props.layout??'Docked')==='Floating';
+    const e=s.stack[s.stack.length-1]||null;
+    const peek=628, snaps={peek,half:400,full:54};
+    const sheetTop=s.dragTop??snaps[s.snap];
+    const tab=s.tab, isMap=tab==='map';
+    const go={}; ['map','search','explore','saved','info'].forEach(t=>go[t]=()=>this.setState({tab:t,layers:false}));
+    const navC={},navF={},navBar={}; ['map','search','explore','saved','info'].forEach(t=>{const a=t===tab; navC[t]=a; navF[t]=a?'#6ea0ff':'rgba(255,255,255,.72)'; navBar[t]=a?'rgba(110,160,255,.18)':'transparent';});
+    const fav = e && (e.kind==='train'||e.kind==='station') && s.favs.includes(e.kind+':'+e.id);
+    const out = {
+      mapRef:this.mapRef, isMap, go, navC, navF, navBar, navDocked:!fl, navFloating:fl,
+      statusBg: isMap&&!(e&&s.snap==='full'&&!s.dragTop) ? 'transparent' : '#f4f6f9',
+      sb:{top:fl?56:47,x:fl?12:0,border:fl?'0':'2px solid var(--color-divider)',shadow:fl?'var(--shadow-md)':'none'},
+      ctl:{layersBg:s.layers?'#2b6ef2':'#fff',layersFg:s.layers?'#fff':'#0f1722'},
+      layersOpen:isMap&&s.layers, toggleLayers:()=>this.setState({layers:!s.layers}),
+      toggleCov:()=>this.setState({cov:!s.cov}), toggleLabels:()=>this.setState({labels:!s.labels}),
+      covTag:s.cov?'#2b6ef2':'#d5dbe4', covKnob:s.cov?'21px':'3px', labTag:s.labels?'#2b6ef2':'#d5dbe4', labKnob:s.labels?'21px':'3px',
+      locate:()=>{ this.map&&this.map.easeTo({center:[76.29,9.97],zoom:9,duration:800}); this.flash('Centred on your location (simulated): near Ernakulam'); },
+      hasSheet:isMap&&!!e, canBack:s.stack.length>1,
+      sh:{x:fl?10:0,top:sheetTop,radius:fl?'30px 30px 0 0':'30px 30px 0 0',shadow:'0 -8px 32px rgba(15,23,34,.14)',trans:s.dragTop==null?'top .32s cubic-bezier(.2,.8,.2,1)':'none',padB:116,headRule:s.snap==='full'?'1px solid #e6eaf0':'1px solid transparent'},
+      dragStart:ev=>{
+        if(ev.target.closest('button')) return;
+        const y0=ev.clientY, t0=sheetTop; let moved=false;
+        const mv=me=>{ const d=me.clientY-y0; if(Math.abs(d)>4) moved=true; this.setState({dragTop:Math.max(54,Math.min(peek+40,t0+d))}); };
+        const up=()=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up);
+          const t=this.state.dragTop??t0; let snap=s.snap;
+          if(!moved) snap = s.snap==='peek'?'half':s.snap==='half'?'full':'half';
+          else snap=Object.entries(snaps).sort((a,b)=>Math.abs(a[1]-t)-Math.abs(b[1]-t))[0][0];
+          this.setState({dragTop:null,snap}); };
+        window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+      },
+      back:()=>this.setState({stack:s.stack.slice(0,-1)}),
+      closeSheet:()=>this.setState({stack:[],snap:'half'}),
+      toggleFav:()=>{ if(!e) return; const k=e.kind+':'+e.id; const favs=s.favs.includes(k)?s.favs.filter(x=>x!==k):[k,...s.favs]; this.persist({favs}); this.setState({favs}); this.flash(favs.includes(k)?'Saved to this device':'Removed from Saved'); },
+      share:()=>{ if(!e) return; const url = e.kind==='between' ? `railyn.app/between?from=${e.from}&to=${e.to}` : `railyn.app/${e.kind}/${e.id}`; try{navigator.clipboard&&navigator.clipboard.writeText('https://'+url);}catch(x){} this.flash('Link copied · '+url); },
+      hd:{kicker:'',code:'',title:'',sub:'',canFav:false,favColor:fav?'#2b6ef2':'#0f1722',kc:'#2b6ef2',cb:'#e8f0fe',cf:'#2b6ef2',favFill:fav?'currentColor':'none'},
+      isTrain:false,isStation:false,isLine:false,isBetween:false,
+      hasToast:!!s.toast, toast:s.toast
+    };
+
+    if(e&&e.kind==='train'){
+      const t=TR[e.id];
+      Object.assign(out.hd,{kicker:'Train · '+t.type,code:t.num,title:t.name,sub:`${stName(t.src)} → ${stName(t.dst)}`,canFav:true});
+      const vis=t.stops.map((x,i)=>({x,i})).filter(o=>s.ttAll||!o.x.pass), n=vis.length;
+      const L=t.stops[t.stops.length-1];
+      out.isTrain=true;
+      const tg=on=>({bg:on?'#fff':'transparent',fg:on?'#0f1722':'#5b6574',sh:on?'0 1px 4px rgba(15,23,34,.12)':'none'}); const TH=tg(!s.ttAll),TA=tg(s.ttAll);
+      out.ttSeg={hBg:TH.bg,hFg:TH.fg,hSh:TH.sh,aBg:TA.bg,aFg:TA.fg,aSh:TA.sh};
+      out.ttHalts=()=>this.setState({ttAll:false}); out.ttAllOn=()=>this.setState({ttAll:true});
+      const pair=t.pair&&TR[t.pair];
+      out.tr={dist:t.km+' km',dur:dur(t.mins),halts:t.stops.filter(x=>!x.pass).length,depT:fm(t.start),arrT:fm(L.arr),arrPlus:L.day>1?'+'+(L.day-1)+'d':'',src:t.src,dst:t.dst,srcN:stName(t.src),dstN:stName(t.dst),
+        days:DAYL.map((l,i)=>{const on=t.days.includes(i);return {l,bg:on?'#2b6ef2':'#eef1f5',fg:on?'#fff':'#9aa3b2',dot:i===(new Date().getDay()+6)%7?'#e59a1a':'transparent'};}),
+        daysText:daysText(t.days)==='Daily'?'Runs daily':'Runs '+daysText(t.days),
+        saveLabel:fav?'Saved':'Save', pair:t.pair||'none', openPair:()=>pair&&this.open('train',t.pair),
+        related:[pair&&{...this.ent2row('train',t.pair),sub:'Return service · '+daysText(pair.days)}].filter(Boolean),
+        stops:vis.map(({x},k)=>{const end=x.arr==null||x.dep==null;return {seq:k+1,name:stName(x.code),code:x.code,arr:x.pass?'':fm(x.arr),dep:x.pass?'pass':fm(x.dep),
+          meta:(x.pass?'Passes without stopping':x.halt?x.halt+' min halt':(x.arr==null?'Origin':'Destination'))+` · ${x.km} km · Day ${x.day}`,
+          op:x.pass?0.6:1,lt:k===0?'50%':'0',lb:k===n-1?'50%':'0',ms:end?18:x.pass?8:14,mbg:end?(x.arr==null?'#0fa390':'#2b6ef2'):x.pass?'#c3cad6':'#fff',mbd:end?(x.arr==null?'#bfe9e0':'#cddcfd'):x.pass?'#c3cad6':'#2b6ef2',mbw:end?'4px':x.pass?'0px':'3px',open:()=>this.open('station',x.code)};})};
+      if(!out.tr.related.length) out.tr.related=[];
+    }
+    if(e&&e.kind==='station'){
+      const c=e.id, st=S[c], d=DIV[st[3]], z=zoneById(d.zone);
+      Object.assign(out.hd,{kc:'#0b7f70',cb:'#dff5f0',cf:'#0b7f70',kicker:'Station'+(st[4]?' · Junction':''),code:c,title:st[0],sub:`${z.name} › ${d.name} Division`,canFav:true});
+      out.isStation=true;
+      const now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
+      let rows=[];
+      Object.values(TR).forEach(t=>{ const x=t.stops.find(y=>y.code===c&&!y.pass); if(!x) return;
+        const time=(x.dep??x.arr)%1440, dir=S[t.dst][1]>st[1]?'North':'South';
+        rows.push({t,x,time,dir}); });
+      rows=rows.filter(r=>s.stDay<0||r.t.days.includes(s.stDay)).filter(r=>s.stDir==='Any'||r.dir===s.stDir).filter(r=>s.stType==='All'||r.t.type===s.stType).filter(r=>!s.stNow||r.time>=nowMin).sort((a,b)=>a.time-b.time);
+      const link=(k,v,fn)=>({k,v,open:fn,color:'#2b6ef2',cur:'pointer'}), kv=(k,v)=>({k,v,open:()=>{},color:'#0f1722',cur:'default'});
+      const near=Object.keys(S).filter(k=>k!==c).map(k=>({k,d:hav(c,k)})).sort((a,b)=>a.d-b.d).slice(0,3);
+      out.st={kv:[kv('Station code',c),kv('Coordinates',`${st[1].toFixed(4)}° N, ${st[2].toFixed(4)}° E`),link('Zone',z.name+' ›',()=>this.setState({tab:'explore',ex:[{kind:'zone',id:z.id}]})),link('Division',d.name+' ›',()=>this.setState({tab:'explore',ex:[{kind:'zone',id:z.id},{kind:'division',id:st[3]}]})),kv('Type',st[4]?'Junction':'Station')],
+        count:rows.length+' scheduled', now:fm(nowMin), nowTag:s.stNow?'#e59a1a':'#d5dbe4', nowKnob:s.stNow?'21px':'3px', empty:!rows.length,
+        dayChips:[this.chip('All',s.stDay<0,()=>this.setState({stDay:-1})),...DAYN.map((l,i)=>this.chip(l,s.stDay===i,()=>this.setState({stDay:i})))],
+        dirChips:['Any','North','South'].map(l=>this.chip(l==='Any'?'Both ways':l+'bound',s.stDir===l,()=>this.setState({stDir:l}))),
+        typeChips:['All','Express','Superfast','Intercity','Passenger'].map(l=>this.chip(l==='All'?'All types':l,s.stType===l,()=>this.setState({stType:l}))),
+        trains:rows.map(r=>({time:fm(r.time),num:r.t.num,name:r.t.name,type:r.t.type,to:r.x.dep==null?'Terminates · from '+stName(r.t.src):'To '+stName(r.t.dst),days:daysText(r.t.days),open:()=>this.open('train',r.t.num)})),
+        lines:Object.entries(LINES).filter(([,l])=>l.seq.includes(c)).map(([id])=>this.ent2row('line',id)),
+        nearby:near.map(n=>({...this.ent2row('station',n.k),sub:Math.round(n.d)+' km away · '+DIV[S[n.k][3]].name}))};
+      out.toggleNow=()=>this.setState({stNow:!s.stNow});
+    }
+    if(e&&e.kind==='line'){
+      const l=LINES[e.id]; let km=0; const n=l.seq.length;
+      const seq=l.seq.map((c,i)=>{ if(i) km+=hav(l.seq[i-1],c)*1.22; return {seq:i+1,code:c,name:stName(c),km:Math.round(km)+' km',lt:i===0?'50%':'0',lb:i===n-1?'50%':'0',open:()=>this.open('station',c)}; });
+      Object.assign(out.hd,{kc:'#5b3fd1',cb:'#efeafe',cf:'#5b3fd1',kicker:l.zone==='KR'?'Railway line · Konkan Railway':'Railway line',code:e.id,title:l.name,sub:`${n} stations · ${Math.round(km)} km`});
+      out.isLine=true;
+      const trains=Object.values(TR).filter(t=>t.stops.some((x,i)=>i>0&&l.seq.includes(x.code)&&l.seq.includes(t.stops[i-1].code)));
+      out.ln={kv:[{k:'Network',v:zoneById(l.zone).name},{k:'Length',v:Math.round(km)+' km'},{k:'Stations',v:n},{k:'Ends',v:`${l.seq[0]} – ${l.seq[n-1]}`}],seq,trains:trains.map(t=>this.ent2row('train',t.num))};
+    }
+
+    const bEnt={from:s.from,to:s.to,day:s.bDay,type:s.bType,time:s.bTime};
+    const bSrc = e&&e.kind==='between' ? e : bEnt;
+    const bRows=this.betweenRows(bSrc);
+    out.between={title:`${s.from} → ${s.to}`,count:bRows.length+(bRows.length===1?' train':' trains'),empty:!bRows.length,any:bRows.length>0,
+      rows:bRows.map(r=>{const a=r.t.stops[r.i],b=r.t.stops[r.j];const dd=b.day-a.day;return {num:r.t.num,name:r.t.name,type:r.t.type,dep:fm(a.dep),arr:fm(b.arr)+(dd>0?' +'+dd:''),dur:dur(b.arr-a.dep),km:(b.km-a.km)+' km',days:daysText(r.t.days),open:()=>this.open('train',r.t.num)};})};
+    if(e&&e.kind==='between'){ out.isBetween=true; Object.assign(out.hd,{kicker:'Between stations',code:`${e.from} → ${e.to}`,title:`${stName(e.from)} to ${stName(e.to)}`,sub:out.between.count+' · scheduled'}); }
+    out.showBetween=()=>this.open('between',s.from+'-'+s.to,true,bEnt);
+
+    out.isSearch=tab==='search'; out.modeIsAll=s.sMode==='all'; out.modeIsBetween=s.sMode==='between';
+    const sg=on=>({bg:on?'#fff':'transparent',fg:on?'#0f1722':'#5b6574',sh:on?'0 1px 4px rgba(15,23,34,.12)':'none'}); const A=sg(s.sMode==='all'),B=sg(s.sMode==='between');
+    out.seg={aBg:A.bg,aFg:A.fg,aSh:A.sh,bBg:B.bg,bFg:B.fg,bSh:B.sh};
+    out.modeAll=()=>this.setState({sMode:'all'}); out.modeBetween=()=>this.setState({sMode:'between'});
+    out.q=s.q; out.setQ=ev=>this.setState({q:ev.target.value});
+    out.qKey=ev=>{ if(ev.key==='Enter'&&s.q.trim()){ const recents=[s.q.trim(),...s.recents.filter(r=>r!==s.q.trim())].slice(0,6); this.persist({recents}); this.setState({recents}); } };
+    const q=s.q.trim().toLowerCase(); out.qEmpty=!q;
+    out.recents=s.recents.map(r=>({label:r,pick:()=>this.setState({q:r})}));
+    let groups=[];
+    if(q){
+      const src=[['Trains','train',Object.values(TR).map(t=>[t.num,[t.num,t.name]])],['Stations','station',Object.keys(S).map(c=>[c,[c,S[c][0]]])],['Lines','line',Object.keys(LINES).map(id=>[id,[LINES[id].name]])],['Zones & networks','zone',ZONES.filter(z=>z.covered).map(z=>[z.id,[z.id,z.name]])],['Divisions','division',Object.keys(DIV).map(id=>[id,[id,DIV[id].name]])]];
+      groups=src.map(([label,k,items])=>{ const hits=items.map(([id,keys])=>({id,sc:Math.max(...keys.map(x=>fuzzy(q,String(x))))})).filter(h=>h.sc>0).sort((a,b)=>b.sc-a.sc);
+        return {label,count:hits.length,items:hits.map(h=>{const r=this.ent2row(k,h.id);const o=r.open;r.open=()=>{const recents=[s.q.trim(),...s.recents.filter(x=>x!==s.q.trim())].slice(0,6);this.persist({recents});this.setState({recents});o();};return r;})}; }).filter(g=>g.count);
+    }
+    out.groups=groups; out.noResults=!!q&&!groups.length;
+    out.from=s.from; out.to=s.to;
+    out.setFrom=ev=>this.setState({from:ev.target.value}); out.setTo=ev=>this.setState({to:ev.target.value});
+    out.swap=()=>this.setState({from:s.to,to:s.from});
+    const mkSel=(val,key,label)=>React.createElement('select',{value:val,'aria-label':label,onChange:ev=>this.setState({[key]:ev.target.value}),style:{width:'100%',border:0,background:'transparent',fontFamily:"'Inter',system-ui,sans-serif",fontSize:16,fontWeight:600,color:'#0f1722',padding:'2px 0',appearance:'none',cursor:'pointer'}},Object.keys(S).map(c=>React.createElement('option',{key:c,value:c},S[c][0]+' ('+c+')')));
+    out.fromSelect=mkSel(s.from,'from','From station'); out.toSelect=mkSel(s.to,'to','To station');
+    out.stationOpts=Object.keys(S).map(c=>({v:c,l:`${S[c][0]} (${c})`}));
+    out.bDayChips=[this.chip('Any',s.bDay<0,()=>this.setState({bDay:-1})),...DAYN.map((l,i)=>this.chip(l,s.bDay===i,()=>this.setState({bDay:i})))];
+    out.bTimeChips=['Any','Morning','Afternoon','Night'].map(l=>this.chip(l==='Any'?'Any time':l,s.bTime===l,()=>this.setState({bTime:l})));
+    out.bTypeChips=['All','Express','Superfast','Intercity','Passenger'].map(l=>this.chip(l==='All'?'All types':l,s.bType===l,()=>this.setState({bType:l})));
+
+    out.isExplore=tab==='explore';
+    const top=s.ex[s.ex.length-1];
+    const exPush=it=>this.setState({ex:[...s.ex,it]});
+    const zStations=zid=>Object.keys(S).filter(c=>zoneOf(c)===zid);
+    const ex={canBack:s.ex.length>0,crumb:'',kicker:'',title:'',hasStats:false,stats:[],meta:'',onMap:()=>{},sections:[]};
+    const stat=(arr)=>arr.map(([n,l],i)=>({n,l,bl:i?'1px solid #eef1f5':'0'}));
+    if(!top){
+      Object.assign(ex,{kicker:'Administrative hierarchy',title:'Explore'});
+      const zr=z=>{ const cnt=zStations(z.id).length; return {bb:'#fdf1dc',bf:'#a2620a',code:z.id,title:z.name,sub:z.covered?`HQ ${z.hq} · ${cnt} stations covered`:`HQ ${z.hq} · Not yet covered`,op:z.covered?1:0.5,open:()=>z.covered?exPush({kind:'zone',id:z.id}):this.flash(z.name+' is outside the prototype coverage')}; };
+      ex.sections=[{label:'Railway zones',count:ZONES.filter(z=>!z.org).length+' of 17 listed',items:ZONES.filter(z=>!z.org).map(zr)},{label:'Separately managed networks',count:'1',items:ZONES.filter(z=>z.org).map(zr)}];
+    } else if(top.kind==='zone'){
+      const z=zoneById(top.id), divs=Object.keys(DIV).filter(d=>DIV[d].zone===z.id), sts=zStations(z.id), lns=Object.keys(LINES).filter(l=>LINES[l].zone===z.id), trs=Object.values(TR).filter(t=>t.stops.some(x=>zoneOf(x.code)===z.id));
+      Object.assign(ex,{crumb:'Explore',kicker:z.org?'Railway organisation':'Railway zone',title:z.name,hasStats:true,stats:stat([[divs.length,z.org?'Regions':'Divisions'],[sts.length,'Stations'],[lns.length,'Lines'],[trs.length,'Trains']]),meta:`Headquarters: ${z.hq}. Counts cover the prototype region only.`,
+        onMap:()=>this.setState({tab:'map',stack:[],focus:sts}),
+        sections:[{label:z.org?'Regions':'Divisions',count:divs.length,items:divs.map(d=>({bb:'#fdf1dc',bf:'#a2620a',code:d,title:DIV[d].name+(z.org?'':' Division'),sub:`HQ ${DIV[d].hq} · ${Object.keys(S).filter(c=>S[c][3]===d).length} stations`,op:1,open:()=>exPush({kind:'division',id:d})}))}]});
+    } else {
+      const d=DIV[top.id], sts=Object.keys(S).filter(c=>S[c][3]===top.id), lns=Object.keys(LINES).filter(l=>LINES[l].seq.some(c=>S[c][3]===top.id)), trs=Object.values(TR).filter(t=>t.stops.some(x=>S[x.code][3]===top.id));
+      Object.assign(ex,{crumb:zoneById(d.zone).name,kicker:zoneById(d.zone).name,title:d.name+(d.zone==='KR'?'':' Division'),hasStats:true,stats:stat([[sts.length,'Stations'],[sts.filter(c=>S[c][4]).length,'Junctions'],[lns.length,'Lines'],[trs.length,'Trains']]),meta:`Divisional HQ: ${d.hq}.`,
+        onMap:()=>this.setState({tab:'map',stack:[],focus:sts}),
+        sections:[{label:'Lines & corridors',count:lns.length,items:lns.map(l=>({...this.ent2row('line',l),op:1}))},{label:'Stations',count:sts.length,items:sts.map(c=>({...this.ent2row('station',c),sub:(S[c][4]?'Junction · ':'')+Object.values(TR).filter(t=>t.stops.some(x=>x.code===c&&!x.pass)).length+' trains',op:1}))}]});
+    }
+    out.ex=ex; out.exBack=()=>this.setState({ex:s.ex.slice(0,-1)});
+
+    out.isSaved=tab==='saved';
+    const res=k=>{const [kind,id]=k.split(':'); return (kind==='train'&&TR[id])||(kind==='station'&&S[id])||(kind==='line'&&LINES[id]) ? this.ent2row(kind,id) : null;};
+    out.savedFavs=s.favs.map(res).filter(Boolean); out.savedRecent=s.viewed.map(res).filter(Boolean);
+    out.favEmpty=!out.savedFavs.length; out.recentEmpty=!out.savedRecent.length;
+    out.savedFavCount=out.savedFavs.length; out.savedRecentCount=out.savedRecent.length;
+
+    out.isInfo=tab==='info';
+    out.infoKv=[{k:'Region',v:'Kerala + Konkan corridor'},{k:'Stations',v:Object.keys(S).length},{k:'Lines',v:Object.keys(LINES).length},{k:'Train services',v:Object.keys(TR).length},{k:'Last import',v:'21 Oct 2026'},{k:'Timetable version',v:'v2026.10.2'}];
+    out.sources=[{title:'OpenStreetMap',lic:'ODbL',sub:'Track geometry and station locations, © OpenStreetMap contributors'},{title:'OpenFreeMap',lic:'Tiles',sub:'Base map vector tiles'},{title:'Timetable',lic:'Sample',sub:'Placeholder schedules for this prototype. Not official data.'}];
+    return out;
+  }
+}
+</script>
+</body>
+</html>

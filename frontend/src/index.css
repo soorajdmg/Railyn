@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #f4f6f9;
+  color: #0f1722;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular numerals for times */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hide maplibre attribution (we show our own) */
+.maplibregl-ctrl-attrib {
+  display: none !important;
+}
+
+/* Safe area (mobile) */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Mobile sheet scrollbar — hide */
+.sheet-body::-webkit-scrollbar {
+  width: 0;
+}
+
+/* Desktop scrollbar — thin */
+@media (min-width: 900px) {
+  .sheet-body::-webkit-scrollbar {
+    width: 4px;
+  }
+  .sheet-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .sheet-body::-webkit-scrollbar-thumb {
+    background: #d5dbe4;
+    border-radius: 2px;
+  }
+  .sheet-body::-webkit-scrollbar-thumb:hover {
+    background: #b8c2ce;
+  }
+}
+
+/* Drag grabber cursor */
+.grab { cursor: grab; }
+.grab:active { cursor: grabbing; }
+
+/* Focus visible */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #2b6ef2;
+  outline-offset: 2px;
+}
+
+/* Link colour */
+a { color: #2b6ef2; }
+a:hover { color: #1f5ee0; }
+
+/* Row hover states */
+.row-hover:hover { background: #f7f9fc; }
+.row-hover-2:hover { background: #e9edf2; }
+
+/* Prevent iOS text size adjust */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}

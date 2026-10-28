@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.pyc
+
+# Node / Frontend
+node_modules/
+dist/
+.next/
+out/
+.nuxt/
+.cache/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# Large data files (pipeline)
+pipeline/raw_data/
+pipeline/processed/
+*.geojson
+*.shp
+*.shx
+*.dbf
+*.prj
+*.pbf
+*.osm
+*.osm.pbf
+*.mbtiles
+*.csv
+*.xlsx
+*.json
+
+# Keep sample/seed files
+!db/seeds/*.py
+!docs/*.md
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
